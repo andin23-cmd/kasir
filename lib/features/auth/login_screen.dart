@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/core/widgets/costom_botton_admin.dart';
+import 'package:flutter_application_1/petugas/main_screen.dart';
 import '../../services/auth_services.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -25,11 +27,11 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: Colors.black, // background luar seperti gambar
       body: Center(
         child: Container(
-          width: 350,
-          height: 650,
+            width: double.infinity,
+            height: double.infinity,
           decoration: BoxDecoration(
             color: const Color(0xFFD1D5DB), // abu muda dalam card
-            borderRadius: BorderRadius.circular(25),
+            borderRadius: BorderRadius.circular(0),
           ),
           child: Column(
             children: [
@@ -40,8 +42,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 decoration: const BoxDecoration(
                   color: Color(0xFF2F4A8A), // biru persis seperti gambar
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(25),
-                    topRight: Radius.circular(25),
+                    topLeft: Radius.circular(0),
+                    topRight: Radius.circular(0),
                   ),
                 ),
                 child: Column(
@@ -166,14 +168,35 @@ class _LoginScreenState extends State<LoginScreen> {
                       final authService = AuthService();
 
                       try {
-                        await authService.login(
+                        final result = await authService.login(
                           emailController.text,
                           passwordController.text,
                         );
 
                         if (!context.mounted) return;
+
+                        if (result.role == 'admin') {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const DashboardScreen(),
+                            ),
+                          );
+                          return;
+                        }
+
+                        if (result.role == 'petugas') {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const MainScreen(),
+                            ),
+                          );
+                          return;
+                        }
+
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Login berhasil")),
+                          SnackBar(content: Text("Role tidak dikenali: ${result.role}")),
                         );
                       } catch (e) {
                         if (!context.mounted) return;
